@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:rxdart/rxdart.dart';
 void main() {
   runApp(MyApp());
 }
@@ -31,7 +31,8 @@ class Counter extends StatefulWidget {
 }
 
 class _CounterState extends State<Counter> {
-  int count = 0;
+  final counterSubject = BehaviorSubject<int>();
+  int counter = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -40,9 +41,16 @@ class _CounterState extends State<Counter> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              '${count}',
-              style: TextStyle(fontSize: 24),
+            StreamBuilder<int>(
+              stream: counterSubject.stream,
+              initialData: 0,
+              builder: (context, snapshot) {
+                if(snapshot.hasData) {
+                  return Text(
+                    '${snapshot.data}',
+                    style: TextStyle(fontSize: 24),);
+                }
+              }
             ),
             RaisedButton(
                 child: Text(
@@ -50,11 +58,10 @@ class _CounterState extends State<Counter> {
                   style: TextStyle(fontSize: 16),
                 ),
                 onPressed: () {
-                  setState(() {
-                    count++;
-                  });
+                  counterSubject.add(++counter);
                 }
-                ),
+            ),
+
           ],
         ),
       ),
